@@ -6,15 +6,20 @@ const { Server } = require("socket.io");
 const path = require("path");
 
 const authRoutes = require("./routes/auth");
+const characterRoutes = require("./routes/characters");
 
 const app = express();
 const server = http.createServer(app);
 
+const PORT = process.env.PORT || 3000;
+
+// Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "client")));
 
-// Authentication API
+// API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/characters", characterRoutes);
 
 // Socket.IO
 const io = new Server(server, {
@@ -24,12 +29,10 @@ const io = new Server(server, {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-
-// Connected players
+// เก็บผู้เล่นที่ออนไลน์
 const players = new Map();
 
-// Health check
+// Health Check
 app.get("/health", (req, res) => {
     res.json({
         status: "online",
@@ -38,12 +41,12 @@ app.get("/health", (req, res) => {
     });
 });
 
-// Game connection
+// Multiplayer Events
 io.on("connection", (socket) => {
 
     console.log("Player connected:", socket.id);
 
-    // Player joins world
+    // ผู้เล่นเข้าร่วมโลก
     socket.on("player:join", (data = {}) => {
 
         const player = {
@@ -58,10 +61,13 @@ io.on("connection", (socket) => {
 
         socket.emit("player:joined", player);
 
-        io.emit("world:players", Array.from(players.values()));
+        io.emit(
+            "world:players",
+            Array.from(players.values())
+        );
     });
 
-    // Player movement
+    // เคลื่อนที่
     socket.on("player:move", (data = {}) => {
 
         const player = players.get(socket.id);
@@ -71,7 +77,9 @@ io.on("connection", (socket) => {
         const x = Number(data.x);
         const y = Number(data.y);
 
-        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+            return;
+        }
 
         player.x = Math.max(0, Math.min(x, 10000));
         player.y = Math.max(0, Math.min(y, 10000));
@@ -79,7 +87,7 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("player:move", player);
     });
 
-    // World chat
+    // แชต
     socket.on("chat:send", (data = {}) => {
 
         const player = players.get(socket.id);
@@ -88,7 +96,9 @@ io.on("connection", (socket) => {
 
         const message = String(data.message || "").trim();
 
-        if (!message || message.length > 200) return;
+        if (!message || message.length > 200) {
+            return;
+        }
 
         io.emit("chat:message", {
             playerId: socket.id,
@@ -98,7 +108,7 @@ io.on("connection", (socket) => {
         });
     });
 
-    // Player disconnects
+    // ผู้เล่นออกจากเกม
     socket.on("disconnect", () => {
 
         players.delete(socket.id);
@@ -107,14 +117,17 @@ io.on("connection", (socket) => {
 
         io.emit("player:left", socket.id);
 
-        io.emit("world:players", Array.from(players.values()));
+        io.emit(
+            "world:players",
+            Array.from(players.values())
+        );
     });
 });
 
-// Start server
+// เริ่มเซิร์ฟเวอร์
 server.listen(PORT, "0.0.0.0", () => {
     console.log("--------------------------------");
-    console.log(" ECHO ISLES RPG SERVER ONLINE");
-    console.log(" Port:", PORT);
+    console.log(" ECHO ISLES RPG SERVER ONLINE ");
+    console.log(` Port: ${PORT}`);
     console.log("--------------------------------");
 });
