@@ -2,22 +2,46 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#101525">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0,
+          maximum-scale=1.0, user-scalable=no">
+
+    <meta name="theme-color" content="#101820">
 
     <title>ECHO ISLES RPG</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/ui.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
 
     <div id="game-container"></div>
 
-    <script src="js/config.js"></script>
+    <!-- Game Systems -->
+    <script src="js/systems/CombatSystem.js"></script>
+    <script src="js/systems/InventorySystem.js"></script>
+    <script src="js/systems/ProfessionSystem.js"></script>
+    <script src="js/systems/CraftingSystem.js"></script>
+    <script src="js/systems/CookingSystem.js"></script>
+    <script src="js/systems/SkillSystem.js"></script>
+    <script src="js/systems/QuestSystem.js"></script>
+    <script src="js/systems/GuildSystem.js"></script>
+    <script src="js/systems/GameSystems.js"></script>
+
+    <!-- Network -->
+    <script src="js/network.js"></script>
+
+    <!-- Game Scenes -->
+    <script src="js/scenes/LoginScene.js"></script>
+    <script src="js/scenes/CharacterScene.js"></script>
+    <script src="js/scenes/CharacterCreatorScene.js"></script>
+    <script src="js/scenes/WorldScene.js"></script>
+
+    <!-- Main Game -->
     <script src="js/main.js"></script>
 
 </body>
