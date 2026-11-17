@@ -1,118 +1,73 @@
-// ======================================
-// ECHO ISLES RPG
-// MAIN GAME ENGINE
-// ======================================
+(() => {
+    "use strict";
 
-class EchoIslesGame extends Phaser.Scene {
-
-    constructor() {
-        super("WorldScene");
-
-        this.player = null;
-        this.cursors = null;
-        this.speed = 180;
+    if (typeof Phaser === "undefined") {
+        console.error("Phaser was not loaded!");
+        return;
     }
 
-    create() {
+    if (typeof GameSystems === "undefined") {
+        console.error("GameSystems was not loaded!");
+        return;
+    }
 
-        const width = this.scale.width;
-        const height = this.scale.height;
+    // สร้างระบบเกมทั้งหมด
+    window.echoGameSystems = new GameSystems();
 
-        // Background
-        this.cameras.main.setBackgroundColor("#263b32");
+    // ตรวจสอบ Scene ที่จำเป็น
+    const requiredScenes = [
+        "LoginScene",
+        "CharacterScene",
+        "WorldScene"
+    ];
 
-        // World ground
-        const graphics = this.add.graphics();
-
-        graphics.fillStyle(0x355c43, 1);
-        graphics.fillRect(0, 0, 3000, 3000);
-
-        // Grass details
-        graphics.fillStyle(0x527b4c, 1);
-
-        for (let i = 0; i < 250; i++) {
-            const x = Phaser.Math.Between(0, 3000);
-            const y = Phaser.Math.Between(0, 3000);
-
-            graphics.fillRect(x, y, 4, 4);
+    for (const sceneName of requiredScenes) {
+        if (typeof window[sceneName] !== "function") {
+            console.error(`Missing scene: ${sceneName}`);
+            return;
         }
+    }
 
-        // Player placeholder
-        this.player = this.add.container(
-            width / 2,
-            height / 2
-        );
+    // ตั้งค่า Phaser
+    const config = {
+        type: Phaser.AUTO,
 
-        const body = this.add.graphics();
+        parent: "game-container",
 
-        body.fillStyle(0x263d91, 1);
-        body.fillRect(-12, -18, 24, 30);
+        width: 1280,
+        height: 720,
 
-        body.fillStyle(0xf0c39b, 1);
-        body.fillRect(-9, -34, 18, 16);
+        backgroundColor: "#17251b",
 
-        body.fillStyle(0x302016, 1);
-        body.fillRect(-10, -37, 20, 7);
+        pixelArt: true,
+        antialias: false,
+        roundPixels: true,
 
-        this.player.add(body);
-
-        // Camera
-        this.cameras.main.setBounds(0, 0, 3000, 3000);
-        this.cameras.main.startFollow(this.player);
-
-        // Keyboard controls
-        this.cursors = this.input.keyboard.createCursorKeys();
-
-        this.keys = this.input.keyboard.addKeys({
-            W: Phaser.Input.Keyboard.KeyCodes.W,
-            A: Phaser.Input.Keyboard.KeyCodes.A,
-            S: Phaser.Input.Keyboard.KeyCodes.S,
-            D: Phaser.Input.Keyboard.KeyCodes.D
-        });
-
-        // Game title
-        this.add.text(20, 20, "ECHO ISLES RPG", {
-            fontSize: "22px",
-            color: "#f5d58b",
-            fontStyle: "bold"
-        }).setScrollFactor(0);
-
-        // Welcome message
-        this.add.text(
-            20,
-            55,
-            "Welcome to Moonlight Kingdom",
-            {
-                fontSize: "13px",
-                color: "#ffffff"
+        physics: {
+            default: "arcade",
+            arcade: {
+                debug: false
             }
-        ).setScrollFactor(0);
+        },
 
-    }
+        scale: {
+            mode: Phaser.Scale.RESIZE,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+        },
 
-    update() {
+        input: {
+            activePointers: 3
+        },
 
-        if (!this.player) return;
+        scene: [
+            LoginScene,
+            CharacterScene,
+            WorldScene
+        ]
+    };
 
-        let velocityX = 0;
-        let velocityY = 0;
+    // สร้างเกมเพียงหนึ่งตัว
+    window.echoGame = new Phaser.Game(config);
 
-        if (this.cursors.left.isDown || this.keys.A.isDown) {
-            velocityX = -1;
-        }
-
-        if (this.cursors.right.isDown || this.keys.D.isDown) {
-            velocityX = 1;
-        }
-
-        if (this.cursors.up.isDown || this.keys.W.isDown) {
-            velocityY = -1;
-        }
-
-        if (this.cursors.down.isDown || this.keys.S.isDown) {
-            velocityY = 1;
-        }
-
-        const length = Math.sqrt(
-            velocityX * velocityX +
-           
+    console.log("ECHO ISLES RPG initialized!");
+})();
