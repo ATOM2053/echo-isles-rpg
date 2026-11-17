@@ -1,42 +1,56 @@
+require("dotenv").config();
+
 const { Pool } = require("pg");
 
-const databaseUrl = process.env.DATABASE_URL;
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
 
-const pool = databaseUrl
-    ? new Pool({
-        connectionString: databaseUrl,
-        ssl: process.env.NODE_ENV === "production"
-            ? { rejectUnauthorized: false }
-            : false
-    })
-    : null;
+    ssl: process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false,
 
-// Execute database query
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000
+});
+
+// คำสั่ง SQL
 async function query(text, params = []) {
-    if (!pool) {
-        throw new Error("DATABASE_URL is not configured");
-    }
-
     return pool.query(text, params);
 }
 
-// Check database connection
+// ตรวจสอบการเชื่อมต่อฐานข้อมูล
 async function checkDatabase() {
-    if (!pool) {
-        return false;
-    }
-
     try {
-        await pool.query("SELECT NOW()");
+        const result = await pool.query(
+            "SELECT NOW() AS current_time"
+        );
+
+        console.log(
+            "PostgreSQL connected:",
+            result.rows[0].current_time
+        );
+
         return true;
+
     } catch (error) {
-        console.error("Database connection failed:", error.message);
+        console.error(
+            "Database connection failed:",
+            error.message
+        );
+
         return false;
     }
+}
+
+// ปิดการเชื่อมต่อ
+async function closeDatabase() {
+    await pool.end();
 }
 
 module.exports = {
     pool,
     query,
-    checkDatabase
+    checkDatabase,
+    closeDatabase
 };
