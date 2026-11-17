@@ -1,0 +1,62 @@
+/* ECHO ISLES RPG - UI SYSTEM */
+
+:root {
+    --gold: #e8bd62;
+    --dark: #101525;
+    --panel: #202b40;
+    --border: #78603b;
+    --text: #f5e8c9;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.game-panel {
+    background: linear-gradient(
+        145deg,
+        #26344c,
+        #121a2a
+    );
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    box-shadow: 0 5px 20px #0008;
+}
+
+.game-button {
+    background: linear-gradient(
+        180deg,
+        #e9c477,
+        #a87932
+    );
+    border: 2px solid #ffe3a0;
+    border-radius: 5px;
+    padding: 10px 18px;
+    color: #291b0d;
+    font-weight: bold;
+}
+
+.game-button:active {
+    transform: scale(0.96);
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .game-panel {
+        max-width: 95vw;
+    }
+
+    .game-button {
+        padding: 12px 16px;
+    }
+}
