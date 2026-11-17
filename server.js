@@ -5,9 +5,18 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 
+const authRoutes = require("./routes/auth");
+
 const app = express();
 const server = http.createServer(app);
 
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "client")));
+
+// Authentication API
+app.use("/api/auth", authRoutes);
+
+// Socket.IO
 const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT_URL || "*",
@@ -17,8 +26,8 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// Serve game client
-app.use(express.static(path.join(__dirname, "client")));
+// Connected players
+const players = new Map();
 
 // Health check
 app.get("/health", (req, res) => {
@@ -29,10 +38,7 @@ app.get("/health", (req, res) => {
     });
 });
 
-// Connected players
-const players = new Map();
-
-// Socket connection
+// Game connection
 io.on("connection", (socket) => {
 
     console.log("Player connected:", socket.id);
@@ -53,7 +59,6 @@ io.on("connection", (socket) => {
         socket.emit("player:joined", player);
 
         io.emit("world:players", Array.from(players.values()));
-
     });
 
     // Player movement
@@ -72,7 +77,6 @@ io.on("connection", (socket) => {
         player.y = Math.max(0, Math.min(y, 10000));
 
         socket.broadcast.emit("player:move", player);
-
     });
 
     // World chat
@@ -92,7 +96,6 @@ io.on("connection", (socket) => {
             message,
             time: Date.now()
         });
-
     });
 
     // Player disconnects
@@ -105,9 +108,7 @@ io.on("connection", (socket) => {
         io.emit("player:left", socket.id);
 
         io.emit("world:players", Array.from(players.values()));
-
     });
-
 });
 
 // Start server
