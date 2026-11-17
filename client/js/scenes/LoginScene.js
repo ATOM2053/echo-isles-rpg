@@ -1,117 +1,108 @@
-// ======================================
-// ECHO ISLES RPG
-// LOGIN SCENE
-// ======================================
-
 class LoginScene extends Phaser.Scene {
-
     constructor() {
         super("LoginScene");
     }
 
     create() {
-
         const width = this.scale.width;
         const height = this.scale.height;
 
-        this.cameras.main.setBackgroundColor("#101525");
+        this.cameras.main.setBackgroundColor("#101b20");
 
-        // Background
+        // พื้นหลัง
         this.add.rectangle(
             width / 2,
             height / 2,
             width,
             height,
-            0x101525
+            0x152a27
         );
 
-        // Game title
+        // แสงตกแต่ง
+        this.add.circle(
+            width / 2,
+            height / 2,
+            180,
+            0x32664b,
+            0.15
+        );
+
+        // ชื่อเกม
         this.add.text(
             width / 2,
-            height * 0.22,
+            height * 0.25,
             "ECHO ISLES",
             {
-                fontSize: "42px",
-                color: "#e8bd62",
-                fontStyle: "bold"
+                fontSize: "48px",
+                fontStyle: "bold",
+                color: "#e8d29a",
+                stroke: "#49351d",
+                strokeThickness: 7
             }
         ).setOrigin(0.5);
 
         this.add.text(
             width / 2,
-            height * 0.29,
+            height * 0.25 + 55,
             "FANTASY MMORPG",
             {
-                fontSize: "15px",
-                color: "#ffffff",
+                fontSize: "16px",
+                color: "#a9c9a9",
                 letterSpacing: 5
             }
         ).setOrigin(0.5);
 
-        // Login panel
-        this.add.rectangle(
+        // ปุ่มเริ่มเกม
+        this.createButton(
             width / 2,
-            height / 2,
-            330,
-            270,
-            0x202b40
-        ).setStrokeStyle(2, 0xc49a52);
-
-        this.add.text(
-            width / 2,
-            height * 0.40,
-            "WELCOME ADVENTURER",
-            {
-                fontSize: "18px",
-                color: "#f5e8c9",
-                fontStyle: "bold"
+            height * 0.58,
+            "ENTER WORLD",
+            () => {
+                this.scene.start("CharacterScene");
             }
-        ).setOrigin(0.5);
-
-        // Guest button
-        const guestButton = this.add.rectangle(
-            width / 2,
-            height * 0.53,
-            220,
-            48,
-            0xa87932
         );
 
-        guestButton.setInteractive({
+        // ข้อความเวอร์ชัน
+        this.add.text(
+            width / 2,
+            height - 30,
+            "ECHO ISLES RPG | ALPHA VERSION",
+            {
+                fontSize: "11px",
+                color: "#80918a"
+            }
+        ).setOrigin(0.5);
+    }
+
+    createButton(x, y, label, callback) {
+        const button = this.add.rectangle(
+            x,
+            y,
+            230,
+            58,
+            0x8c6735
+        );
+
+        button.setInteractive({
             useHandCursor: true
         });
 
-        this.add.text(
-            width / 2,
-            height * 0.53,
-            "ENTER WORLD",
-            {
-                fontSize: "17px",
-                color: "#ffffff",
-                fontStyle: "bold"
-            }
-        ).setOrigin(0.5);
+        const text = this.add.text(x, y, label, {
+            fontSize: "20px",
+            color: "#ffffff",
+            fontStyle: "bold"
+        }).setOrigin(0.5);
 
-        guestButton.on("pointerdown", () => {
-
-            this.scene.start("WorldScene");
-
+        button.on("pointerover", () => {
+            button.setFillStyle(0xb58a4b);
         });
 
-        this.add.text(
-            width / 2,
-            height * 0.72,
-            "Version 0.1.0",
-            {
-                fontSize: "12px",
-                color: "#9ba6b8"
-            }
-        ).setOrigin(0.5);
+        button.on("pointerout", () => {
+            button.setFillStyle(0x8c6735);
+        });
 
+        button.on("pointerdown", callback);
     }
 }
 
-// Register scene
 window.LoginScene = LoginScene;
-
-console.log("Login Scene Loaded!");
